@@ -1,8 +1,8 @@
 targetScope = 'resourceGroup'
 
 param location string = resourceGroup().location
-param virtualMachineName string = 'vmbicepdemo'
-param virtualMachineSize string = 'Standard_D2s_v3'
+param serverName string
+param size string = 'Standard_D2s_v3'
 param adminUsername string = 'azureuser'
 @secure()
 param adminPassword string = newGuid()
@@ -11,9 +11,9 @@ param imagePublisher string = 'MicrosoftWindowsServer'
 param imageOffer string = 'WindowsServer'
 param imageSku string = '2019-Datacenter'
 param imageVersion string = 'latest'
-param osDiskName string = 'mdkbicepdemo-os'
+param osDiskName string = 'mdk-${serverName}-os'
 param osDiskType string = 'StandardSSD_LRS'
-param networkInterfaceName string = 'nic-bicepdemo'
+param networkInterfaceName string = 'nic-${serverName}'
 param subnetId string
 param dscUrl string = 'https://gist.github.com/p1johnson/3817a791bd82d1d0e469104432128f59/raw/JumpServer.zip'
 param dscScript string = 'JumpServer.ps1'
@@ -38,14 +38,14 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-05-01' = {
 }
 
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
-  name: virtualMachineName
+  name: serverName
   location: location
   properties: {
     hardwareProfile: {
-      vmSize: virtualMachineSize
+      vmSize: size
     }
     osProfile: {
-      computerName: virtualMachineName
+      computerName: serverName
       adminUsername: adminUsername
       adminPassword: adminPassword
       windowsConfiguration: {

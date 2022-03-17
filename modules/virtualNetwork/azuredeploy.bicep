@@ -1,15 +1,15 @@
 targetScope = 'resourceGroup'
 
-param location string = resourceGroup().location
-param virtualNetworkName string = 'vnet-bicep-demo'
-param virtualNetworkAddresses array = [
-  '10.0.0.0/16'
-]
+param location string
+param virtualNetworkName string
+param virtualNetworkAddresses array
 param virtualNetworkDnsServers array = []
-param subnetName string = 'default'
-param subnetAddress string = '10.0.1.0/24'
+param serverSubnetName string
+param serverSubnetAddress string
+param bastionSubnetAddress string
 
-output subnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, subnetName)
+output serverSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, serverSubnetName)
+output bastionSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, 'AzureBastionSubnet')
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-05-01' = {
   name: virtualNetworkName
@@ -23,9 +23,15 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-05-01' = {
     }
     subnets: [
       {
-        name: subnetName
+        name: serverSubnetName
         properties: {
-          addressPrefix: subnetAddress
+          addressPrefix: serverSubnetAddress
+        }
+      }
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: bastionSubnetAddress
         }
       }
     ]
